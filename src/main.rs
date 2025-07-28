@@ -1,30 +1,87 @@
 mod transaction;
 mod block;
 mod blockchain;
-
+mod utils;
 use crate::block::Block;
+use crate::blockchain::Blockchain;
 use crate::transaction::Transaction;
 fn main() {
-}
 
+    let transaction = Transaction{
+        receiver: "0x123".into(),
+        sender: "0x123".into(),
+        amount: 40
+    };
+
+    let transaction1 = Transaction{
+        receiver: "0x123".into(),
+        sender: "0x123".into(),
+        amount: 40
+    };
+    let transactions = vec![transaction, transaction1];
+    let mut blockchain = Blockchain::new().unwrap();
+    blockchain.add_block(transactions);
+
+
+}
 
 #[cfg(test)]
 mod  test{
+use std::vec;
+
+use sha2::digest::typenum::Len;
+
 use super::*;
 #[test]
-fn tests_block_transaction() {
+fn tests_genesis_block() {
     println!("Hello, world!");
     let transaction = Transaction{
         receiver: "0x123".into(),
         sender: "0x123".into(),
         amount: 40
     };
-    let mut transactions = Vec::new();
-    transactions.push(transaction);
-    let genesis_block = Block::new(  1, transactions, "12334".into(), "0x1234".into());
-    assert_eq!(genesis_block.transactions.len(), 1);
-    assert_eq!(genesis_block.hash, genesis_block.calculate_hash().ok().unwrap());
+    let transactions = vec![transaction];
+    
+    match   Blockchain::new(){
+
+        Ok(mut blockchain) =>{
+            assert_eq!(blockchain.chain.len(), 1);
+            assert_eq!(blockchain.chain[0].transactions.len(), 0);
+            blockchain.add_block(transactions).ok().unwrap();
+
+        },
+        Err(err) => println!("Error: {:?}", err)
+        
+    }
+    
 
 }
+
+#[test]
+fn tests_add_block() {
+    println!("Hello, world!");
+    let transaction = Transaction{
+        receiver: "0x123".into(),
+        sender: "0x123".into(),
+        amount: 40
+    };
+    let transactions = vec![transaction];
+    
+    match   Blockchain::new(){
+
+        Ok(mut blockchain) =>{
+            blockchain.add_block(transactions).ok().unwrap();
+            assert_eq!(blockchain.chain.len(), 2);
+            assert_eq!(blockchain.chain[1].transactions.len(), 1);
+
+        },
+        Err(err) => println!("Error: {:?}", err)
+        
+    }
+    
+
+}
+
+
 
 }
