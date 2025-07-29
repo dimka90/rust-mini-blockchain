@@ -33,7 +33,6 @@ mod test {
     use super::*;
     #[test]
     fn tests_genesis_block() {
-        println!("Hello, world!");
         let transaction = Transaction {
             receiver: "0x123".into(),
             sender: "0x123".into(),
@@ -66,6 +65,61 @@ mod test {
                 blockchain.add_block(transactions).ok().unwrap();
                 assert_eq!(blockchain.chain.len(), 2);
                 assert_eq!(blockchain.chain[1].transactions.len(), 1);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
+    }
+
+    #[test]
+    fn  test_valid_block() {
+
+        let transaction = Transaction {
+            receiver: "0x123".into(),
+            sender: "0x123".into(),
+            amount: 40,
+        };
+
+         let transaction1 = Transaction{
+            receiver: "0x123".into(),
+            sender: "0x123".into(),
+            amount: 100
+        };
+        let transactions = vec![transaction, transaction1];
+
+        match Blockchain::new() {
+            Ok(mut blockchain) => {
+                assert_eq!(blockchain.chain.len(), 1);
+                blockchain.add_block(transactions).ok().unwrap();
+                assert_eq!(blockchain.chain[1].transactions.len(), 2);
+                assert_eq!(blockchain.is_valid(), true);
+            }
+            Err(err) => println!("Error: {:?}", err),
+        }
+    }
+
+    #[test]
+     fn  test_invalid_block() {
+
+        let transaction = Transaction {
+            receiver: "0x123".into(),
+            sender: "0x123".into(),
+            amount: 40,
+        };
+
+         let transaction1 = Transaction{
+            receiver: "0x123".into(),
+            sender: "0x123".into(),
+            amount: 100
+        };
+        let transactions = vec![transaction, transaction1];
+
+        match Blockchain::new() {
+            Ok(mut blockchain) => {
+                assert_eq!(blockchain.chain.len(), 1);
+                blockchain.add_block(transactions).ok().unwrap();
+                assert_eq!(blockchain.chain[1].transactions.len(), 2);
+                blockchain.chain[1].index = 10;
+                assert_eq!(blockchain.is_valid(), false);
             }
             Err(err) => println!("Error: {:?}", err),
         }
