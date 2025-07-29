@@ -1,6 +1,7 @@
 
+use std::env::current_exe;
 use std::vec;
-use crate::block::Block;
+use crate::block::{Block};
 use crate::transaction::Transaction;
 use crate::utils::utils::get_timestamp;
 #[derive(Debug)]
@@ -12,15 +13,18 @@ impl  Blockchain {
 
     pub fn new () -> Result<Self, String>{
 
-        let genesis_block = Block{
-            index: 0,
-            timestamp: get_timestamp().unwrap(),
-            previous_hash: "0".into(),
-            transactions: vec![],
-            hash: "0".into(),
-            validator: "0x0000".into()
+        let genesis_transaction = Transaction {
+        sender: "0x0000".into(),
+        receiver: "0x742d35Cc6634C0532925a3b8D4C9db96C4b4d8b6".into(),
+        amount: 1000000 
         };
 
+        let genesis_block = Block::new(
+             0,
+    vec![genesis_transaction],
+        "0".into(), 
+        "0x0000".into()
+        );
        Ok( Blockchain{
             chain: vec![genesis_block]
         })
@@ -38,5 +42,25 @@ impl  Blockchain {
             );
             Ok(self.chain.push(new_block))
             
+    }
+
+    pub fn is_valid(&self) -> bool{
+        for i in 1..self.chain.len(){
+
+            if self.chain.is_empty(){
+                return  false;
+            }
+            let current = &self.chain[i];
+            let previous = &self.chain[i-1];
+            
+            let block_hash = current.calculate_hash().unwrap();
+            if block_hash != current.hash{
+                return  false;
+            }
+            if current.previous_hash != previous.hash{
+                return  false;
+            }
+        }
+        true
     }
 }
